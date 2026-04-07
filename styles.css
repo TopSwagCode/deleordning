@@ -1,0 +1,433 @@
+:root {
+  /* Parent colors */
+  --color-ina: #e76f51;
+  --color-ina-bg: #fde4dc;
+  --color-ina-text: #7a2e1a;
+  --color-joshua: #2a9d8f;
+  --color-joshua-bg: #d6efeb;
+  --color-joshua-text: #1b4f48;
+
+  /* Status colors */
+  --color-today-ring: #1d4ed8;
+  --color-holiday: #c1121f;
+  --color-observance: #b5651d;
+  --color-school: #6a4c93;
+
+  /* Neutrals */
+  --color-bg: #f7f7f5;
+  --color-surface: #ffffff;
+  --color-border: #e4e4e0;
+  --color-text: #1f1f1f;
+  --color-text-muted: #6b6b6b;
+  --color-weeknum-bg: #f0f0ec;
+
+  /* Spacing */
+  --radius: 8px;
+  --radius-sm: 4px;
+  --gap: 1rem;
+  --max-width: 1400px;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  padding: 1.5rem 1rem 1rem;
+  text-align: center;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.site-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Year navigation ---------- */
+.year-nav {
+  display: inline-flex;
+  gap: 0.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.25rem;
+}
+
+.year-nav button {
+  border: 0;
+  background: transparent;
+  padding: 0.5rem 1.1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.year-nav button:hover {
+  background: var(--color-weeknum-bg);
+}
+
+.year-nav button:focus-visible {
+  outline: 2px solid var(--color-today-ring);
+  outline-offset: 2px;
+}
+
+.year-nav button[aria-pressed="true"] {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+/* ---------- Legend ---------- */
+.legend {
+  max-width: var(--max-width);
+  margin: 0 auto 1rem;
+  padding: 0 1rem;
+}
+
+.legend__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.legend__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.legend__swatch {
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.legend__swatch--ina { background: var(--color-ina-bg); border-color: var(--color-ina); }
+.legend__swatch--joshua { background: var(--color-joshua-bg); border-color: var(--color-joshua); }
+.legend__swatch--today {
+  background: var(--color-surface);
+  border: 2px solid var(--color-today-ring);
+}
+.legend__swatch--holiday {
+  background: var(--color-surface);
+  color: var(--color-holiday);
+  position: relative;
+}
+.legend__swatch--holiday::after {
+  content: "15";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-holiday);
+}
+.legend__swatch--observance {
+  background: var(--color-surface);
+  position: relative;
+}
+.legend__swatch--observance::after {
+  content: "15";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-observance);
+}
+.legend__swatch--school {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(106, 76, 147, 0.25),
+      rgba(106, 76, 147, 0.25) 3px,
+      transparent 3px,
+      transparent 6px
+    ),
+    var(--color-surface);
+  border-color: var(--color-school);
+}
+
+/* ---------- Year grid ---------- */
+.year-grid {
+  display: grid;
+  gap: var(--gap);
+  padding: 0 1rem 2rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 540px) {
+  .year-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 768px) {
+  .year-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1100px) {
+  .year-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ---------- Month ---------- */
+.month {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  break-inside: avoid;
+}
+
+.month__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.month__grid {
+  display: grid;
+  grid-template-columns: 1.4rem repeat(7, 1fr);
+  gap: 2px;
+}
+
+.month__head {
+  display: grid;
+  grid-template-columns: 1.4rem repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 2px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.month__head-cell {
+  padding: 0.2rem 0;
+}
+
+.month__weeknum-label {
+  /* Empty corner above week number column */
+}
+
+.cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  min-height: 1.8rem;
+}
+
+.cell--weeknum {
+  background: var(--color-weeknum-bg);
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.cell--empty {
+  background: transparent;
+}
+
+.cell--ina {
+  background: var(--color-ina-bg);
+  color: var(--color-ina-text);
+}
+
+.cell--joshua {
+  background: var(--color-joshua-bg);
+  color: var(--color-joshua-text);
+}
+
+.cell--holiday {
+  color: var(--color-holiday);
+  font-weight: 700;
+}
+
+.cell--observance {
+  color: var(--color-observance);
+  font-weight: 700;
+}
+
+/* School holiday: diagonal stripe overlay */
+.cell--school::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(106, 76, 147, 0.32),
+    rgba(106, 76, 147, 0.32) 3px,
+    transparent 3px,
+    transparent 7px
+  );
+  pointer-events: none;
+}
+
+/* Today ring (drawn above backgrounds) */
+.cell--today {
+  box-shadow: inset 0 0 0 2px var(--color-today-ring);
+  font-weight: 700;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1rem 1.5rem 2rem;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  text-align: center;
+  border-top: 1px solid var(--color-border);
+}
+
+.site-footer p {
+  max-width: 44rem;
+  margin: 1rem auto 0;
+}
+
+/* ---------- Print ---------- */
+@media print {
+  :root {
+    --color-bg: #fff;
+    --color-surface: #fff;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .year-nav,
+  .site-footer {
+    display: none !important;
+  }
+
+  .site-header {
+    padding: 0.5rem 0;
+  }
+
+  .year-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem;
+    padding: 0;
+  }
+
+  .month {
+    border: 1px solid #000;
+    padding: 0.35rem;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .cell {
+    font-size: 0.68rem;
+    border: 1px solid #ccc;
+  }
+
+  /* Use patterns not color for print */
+  .cell--ina {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000;
+  }
+
+  .cell--joshua {
+    background: repeating-linear-gradient(
+      45deg,
+      #000 0,
+      #000 1px,
+      #fff 1px,
+      #fff 4px
+    ) !important;
+    color: #000 !important;
+    border: 1px solid #000;
+  }
+
+  .cell--joshua::before {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    background: #fff;
+    z-index: 0;
+    border-radius: 2px;
+  }
+
+  .cell--joshua > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cell--today {
+    box-shadow: inset 0 0 0 2px #000;
+  }
+
+  .cell--holiday,
+  .cell--observance {
+    text-decoration: underline;
+    color: #000 !important;
+  }
+
+  .cell--school::after {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.45) 2px,
+      transparent 2px,
+      transparent 5px
+    );
+  }
+}

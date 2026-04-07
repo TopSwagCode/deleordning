@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storms kalender — Deleordning</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <h1>Storms kalender</h1>
+    <p class="subtitle">Deleordning mellem Ina og Joshua — 2,2,5,5 rotation</p>
+    <nav class="year-nav" aria-label="Vælg år">
+      <button type="button" data-year="2025" aria-pressed="false">2025</button>
+      <button type="button" data-year="2026" aria-pressed="true">2026</button>
+      <button type="button" data-year="2027" aria-pressed="false">2027</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="legend" aria-label="Farveforklaring">
+      <h2 class="legend__title">Farveforklaring</h2>
+      <ul class="legend__list">
+        <li class="legend__item">
+          <span class="legend__swatch legend__swatch--ina" aria-hidden="true"></span>
+          Ina
+        </li>
+        <li class="legend__item">
+          <span class="legend__swatch legend__swatch--joshua" aria-hidden="true"></span>
+          Joshua
+        </li>
+        <li class="legend__item">
+          <span class="legend__swatch legend__swatch--today" aria-hidden="true"></span>
+          I dag
+        </li>
+        <li class="legend__item">
+          <span class="legend__swatch legend__swatch--holiday" aria-hidden="true"></span>
+          Helligdag
+        </li>
+        <li class="legend__item">
+          <span class="legend__swatch legend__swatch--observance" aria-hidden="true"></span>
+          Mærkedag
+        </li>
+        <li class="legend__item">
+          <span class="legend__swatch legend__swatch--school" aria-hidden="true"></span>
+          Skoleferie
+        </li>
+      </ul>
+    </section>
+
+    <section id="year-grid" class="year-grid" aria-live="polite" aria-label="Årskalender"></section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      <strong>Ordningen:</strong> Mandag og tirsdag er altid hos Ina. Onsdag og torsdag er altid hos Joshua.
+      Fredag, lørdag og søndag skifter: I lige ISO-uger er de hos Ina, i ulige ISO-uger hos Joshua.
+      Det giver en 2,2,5,5 rotation over to uger.
+    </p>
+  </footer>
+</body>
+</html>
