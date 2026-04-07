@@ -13,6 +13,7 @@
   --color-observance: #b5651d;
   --color-school: #6a4c93;
   --color-weekend: #16a34a;
+  --color-sfo: #16a34a;
 
   /* Neutrals */
   --color-bg: #f7f7f5;
@@ -134,6 +135,13 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+
+.legend__item--inactive {
+  opacity: 0.35;
 }
 
 .legend__swatch {
@@ -200,6 +208,29 @@ body {
   background: var(--color-surface);
   border: 2px solid var(--color-weekend);
 }
+.legend__swatch--sfo {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(106, 76, 147, 0.25),
+      rgba(106, 76, 147, 0.25) 3px,
+      transparent 3px,
+      transparent 6px
+    ),
+    var(--color-surface);
+  border-color: var(--color-school);
+  position: relative;
+}
+.legend__swatch--sfo::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-sfo);
+}
 
 /* ---------- Stats ---------- */
 .stats {
@@ -218,7 +249,7 @@ body {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   min-width: 10rem;
 }
 
@@ -231,7 +262,7 @@ body {
 }
 
 .stats__name {
-  margin: 0;
+  margin: 0 0 0.35rem;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text-muted);
@@ -239,17 +270,44 @@ body {
   letter-spacing: 0.04em;
 }
 
+.stats__row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stats__divider {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding-bottom: 1rem;
+}
+
 .stats__number {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   line-height: 1.2;
 }
 
-.stats__card--ina .stats__number {
+.stats__number--sfo {
+  color: var(--color-sfo);
+}
+
+.stats__number--total {
+  color: var(--color-text-muted);
+}
+
+.stats__card--ina .stats__number:not(.stats__number--sfo):not(.stats__number--total) {
   color: var(--color-ina);
 }
 
-.stats__card--joshua .stats__number {
+.stats__card--joshua .stats__number:not(.stats__number--sfo):not(.stats__number--total) {
   color: var(--color-joshua);
 }
 
@@ -405,6 +463,29 @@ body {
   outline-offset: -2px;
   font-weight: 700;
 }
+
+/* SFO open during school holiday: green dot indicator */
+.cell--sfo-open::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-sfo);
+  z-index: 1;
+}
+
+/* ---------- Legend toggle hide states ---------- */
+.year-grid.hide-ina .cell--ina { background: var(--color-surface); color: var(--color-text); }
+.year-grid.hide-joshua .cell--joshua { background: var(--color-surface); color: var(--color-text); }
+.year-grid.hide-today .cell--today { outline: none; }
+.year-grid.hide-holiday .cell--holiday { box-shadow: none; color: inherit; font-weight: 500; }
+.year-grid.hide-observance .cell--observance { box-shadow: none; color: inherit; font-weight: 500; }
+.year-grid.hide-school .cell--school::after { display: none; }
+.year-grid.hide-sfo .cell--sfo-open::before { display: none; }
+.year-grid.hide-weekend .cell--weekend { box-shadow: none; }
 
 /* ---------- Footer ---------- */
 .site-footer {

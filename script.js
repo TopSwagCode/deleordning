@@ -9,14 +9,6 @@
     parents: { ina: 'Ina', joshua: 'Joshua' },
     yearRange: [2025, 2026, 2027],
     defaultYear: 2026,
-    schoolHolidays: {
-      vinterferieWeek: 7,
-      efteraarsferieWeek: 42,
-      sommerferieWeeks: [27, 28, 29, 30, 31],
-      // Juleferie: 22. dec til 2. jan (crosses year boundary)
-      juleferie: { startMonth: 12, startDay: 22, endMonth: 1, endDay: 2 },
-      // Påskeferie computed dynamically from computeEaster()
-    },
     weekdayLabels: ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'],
     monthLabels: [
       'Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni',
@@ -26,6 +18,77 @@
       'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag',
       'Fredag', 'Lørdag', 'Søndag',
     ],
+  };
+
+  // -------------------------------------------------------------------------
+  // Per-year school holiday & SFO data — Horsens Kommune
+  // Format: [name, startMonth, startDay, endMonth, endDay]
+  // SFO format: [startMonth, startDay, endMonth, endDay]
+  // -------------------------------------------------------------------------
+  const YEAR_DATA = {
+    2025: {
+      school: [
+        ['Vinterferie', 2, 8, 2, 16],
+        ['Påskeferie', 4, 12, 4, 21],
+        ['Kristi Himmelfart', 5, 29, 6, 1],
+        ['Sommerferie', 6, 28, 8, 10],
+        ['Efterårsferie', 10, 11, 10, 19],
+        ['Juleferie', 12, 20, 12, 31],
+      ],
+      sfo: [
+        [2, 8, 2, 16],      // Vinterferie
+        [4, 12, 4, 21],     // Påskeferie
+        [5, 29, 5, 29],     // Kristi Himmelfart (torsdag, fri ofte lukket)
+        [6, 28, 7, 18],     // Sommerferie del 1
+        [8, 1, 8, 10],      // Sommerferie del 2
+        [10, 11, 10, 19],   // Efterårsferie
+        [12, 20, 12, 31],   // Juleferie (undtagen helligdage)
+      ],
+    },
+    2026: {
+      school: [
+        ['Juleferie', 1, 1, 1, 4],
+        ['Vinterferie', 2, 7, 2, 15],
+        ['Påskeferie', 3, 28, 4, 6],
+        ['Kristi Himmelfart', 5, 14, 5, 17],
+        ['Pinseferie', 5, 23, 5, 25],
+        ['Sommerferie', 6, 27, 8, 9],
+        ['Efterårsferie', 10, 10, 10, 18],
+        ['Juleferie', 12, 19, 12, 31],
+      ],
+      sfo: [
+        [1, 1, 1, 4],       // Juleferie (fra 2025)
+        [2, 7, 2, 15],      // Vinterferie
+        [3, 28, 4, 6],      // Påskeferie (undtagen helligdage)
+        [5, 14, 5, 14],     // Kristi Himmelfart (torsdag, fri ofte lukket)
+        [6, 27, 7, 17],     // Sommerferie del 1
+        [8, 1, 8, 9],       // Sommerferie del 2
+        [10, 10, 10, 18],   // Efterårsferie
+        [12, 19, 12, 31],   // Juleferie (undtagen helligdage)
+      ],
+    },
+    2027: {
+      school: [
+        ['Juleferie', 1, 1, 1, 4],
+        ['Vinterferie', 2, 13, 2, 21],
+        ['Påskeferie', 3, 20, 3, 29],
+        ['Kristi Himmelfart', 5, 6, 5, 9],
+        ['Pinseferie', 5, 15, 5, 17],
+        ['Sommerferie', 6, 26, 8, 8],
+        ['Efterårsferie', 10, 9, 10, 17],
+        ['Juleferie', 12, 18, 12, 31],
+      ],
+      sfo: [
+        [1, 1, 1, 4],       // Juleferie (fra 2026)
+        [2, 13, 2, 21],     // Vinterferie
+        [3, 20, 3, 29],     // Påskeferie (undtagen helligdage)
+        [5, 6, 5, 6],       // Kristi Himmelfart (torsdag, fri ofte lukket)
+        [6, 26, 7, 16],     // Sommerferie del 1
+        [8, 1, 8, 8],       // Sommerferie del 2
+        [10, 9, 10, 17],    // Efterårsferie
+        [12, 18, 12, 31],   // Juleferie (undtagen helligdage)
+      ],
+    },
   };
 
   // -------------------------------------------------------------------------
@@ -140,64 +203,19 @@
   }
 
   // -------------------------------------------------------------------------
-  // School holidays — returns array of {start, end, name} inclusive ranges
+  // School holidays — explicit per-year date ranges
   // -------------------------------------------------------------------------
   const schoolCache = new Map();
 
   function getSchoolHolidays(year) {
     if (schoolCache.has(year)) return schoolCache.get(year);
-
-    const ranges = [];
-    const cfg = CONFIG.schoolHolidays;
-
-    // Helper: find Monday (ISO day 1) of a given ISO week in a year
-    const mondayOfISOWeek = (y, week) => {
-      // Jan 4 is always in ISO week 1
-      const jan4 = new Date(y, 0, 4);
-      const jan4Day = getISODay(jan4);
-      const week1Monday = addDays(jan4, -(jan4Day - 1));
-      return addDays(week1Monday, (week - 1) * 7);
-    };
-
-    const weekRange = (y, week, name) => {
-      const start = mondayOfISOWeek(y, week);
-      const end = addDays(start, 6);
-      return { start, end, name };
-    };
-
-    // Vinterferie
-    ranges.push(weekRange(year, cfg.vinterferieWeek, 'Vinterferie'));
-
-    // Påskeferie: Monday before Palm Sunday → Easter Monday (inclusive)
-    // Palm Sunday = Easter - 7; Monday before = Easter - 13
-    const easter = computeEaster(year);
-    const paaskeStart = addDays(easter, -13);
-    const paaskeEnd = addDays(easter, 1);
-    ranges.push({ start: paaskeStart, end: paaskeEnd, name: 'Påskeferie' });
-
-    // Sommerferie (multiple consecutive weeks merged into one range)
-    const sommerWeeks = cfg.sommerferieWeeks;
-    const sommerStart = mondayOfISOWeek(year, sommerWeeks[0]);
-    const sommerEnd = addDays(mondayOfISOWeek(year, sommerWeeks[sommerWeeks.length - 1]), 6);
-    ranges.push({ start: sommerStart, end: sommerEnd, name: 'Sommerferie' });
-
-    // Efterårsferie
-    ranges.push(weekRange(year, cfg.efteraarsferieWeek, 'Efterårsferie'));
-
-    // Juleferie: 22. dec of year → 2. jan of year+1
-    // and 1.-2. jan of year (tail of previous year's juleferie)
-    const jf = cfg.juleferie;
-    ranges.push({
-      start: new Date(year, jf.startMonth - 1, jf.startDay),
-      end: new Date(year, 11, 31),
-      name: 'Juleferie',
-    });
-    ranges.push({
-      start: new Date(year, 0, 1),
-      end: new Date(year, jf.endMonth - 1, jf.endDay),
-      name: 'Juleferie',
-    });
-
+    const data = YEAR_DATA[year];
+    if (!data) return [];
+    const ranges = data.school.map(([name, sm, sd, em, ed]) => ({
+      name,
+      start: new Date(year, sm - 1, sd),
+      end: new Date(year, em - 1, ed),
+    }));
     schoolCache.set(year, ranges);
     return ranges;
   }
@@ -211,6 +229,33 @@
       }
     }
     return null;
+  }
+
+  // -------------------------------------------------------------------------
+  // SFO — explicit per-year open ranges
+  // -------------------------------------------------------------------------
+  const sfoCache = new Map();
+
+  function getSFORanges(year) {
+    if (sfoCache.has(year)) return sfoCache.get(year);
+    const data = YEAR_DATA[year];
+    if (!data) return [];
+    const ranges = data.sfo.map(([sm, sd, em, ed]) => ({
+      start: new Date(year, sm - 1, sd),
+      end: new Date(year, em - 1, ed),
+    }));
+    sfoCache.set(year, ranges);
+    return ranges;
+  }
+
+  /** Is SFO open on this date? Checks against year's SFO open ranges. */
+  function isSFOOpen(date, year) {
+    const ranges = getSFORanges(year);
+    const t = date.getTime();
+    for (const r of ranges) {
+      if (t >= r.start.getTime() && t <= r.end.getTime()) return true;
+    }
+    return false;
   }
 
   // -------------------------------------------------------------------------
@@ -237,27 +282,27 @@
   function computeStats(year) {
     const holidays = getPublicHolidays(year);
     const schoolRanges = getSchoolHolidays(year);
-    const ina = { vacation: 0, schoolDays: 0 };
-    const joshua = { vacation: 0, schoolDays: 0 };
+    const ina = { withSfo: 0, withoutSfo: 0 };
+    const joshua = { withSfo: 0, withoutSfo: 0 };
 
     const daysInYear = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 366 : 365;
     for (let d = 0; d < daysInYear; d++) {
       const date = new Date(year, 0, 1 + d);
       const isoDay = getISODay(date);
-      if (isoDay >= 6) continue; // weekends — not work days
+      if (isoDay >= 6) continue; // weekends
 
       const parent = getParent(date);
       const isHoliday = holidays.has(dateKey(date));
-      const isSchoolClosed = !!getSchoolHolidayName(date, schoolRanges);
-
       if (isHoliday) continue; // public holiday — already off work
 
-      if (isSchoolClosed) {
-        if (parent === 'ina') ina.vacation++;
-        else joshua.vacation++;
+      const schoolName = getSchoolHolidayName(date, schoolRanges);
+      if (!schoolName) continue; // school in session — no issue
+
+      const bucket = parent === 'ina' ? ina : joshua;
+      if (isSFOOpen(date, year)) {
+        bucket.withSfo++;
       } else {
-        if (parent === 'ina') ina.schoolDays++;
-        else joshua.schoolDays++;
+        bucket.withoutSfo++;
       }
     }
     return { ina, joshua };
@@ -268,18 +313,27 @@
     if (!container) return;
 
     const stats = computeStats(year);
-    container.innerHTML = `
-      <div class="stats__card stats__card--ina">
-        <h3 class="stats__name">Ina</h3>
-        <div class="stats__number">${stats.ina.vacation}</div>
-        <div class="stats__label">feriedage skal bruges</div>
-      </div>
-      <div class="stats__card stats__card--joshua">
-        <h3 class="stats__name">Joshua</h3>
-        <div class="stats__number">${stats.joshua.vacation}</div>
-        <div class="stats__label">feriedage skal bruges</div>
-      </div>
-    `;
+    const card = (name, cls, data) => `
+      <div class="stats__card stats__card--${cls}">
+        <h3 class="stats__name">${name}</h3>
+        <div class="stats__row">
+          <div class="stats__item">
+            <div class="stats__number">${data.withoutSfo}</div>
+            <div class="stats__label">uden SFO</div>
+          </div>
+          <div class="stats__divider">+</div>
+          <div class="stats__item">
+            <div class="stats__number stats__number--sfo">${data.withSfo}</div>
+            <div class="stats__label">med SFO</div>
+          </div>
+          <div class="stats__divider">=</div>
+          <div class="stats__item">
+            <div class="stats__number stats__number--total">${data.withoutSfo + data.withSfo}</div>
+            <div class="stats__label">i alt</div>
+          </div>
+        </div>
+      </div>`;
+    container.innerHTML = card('Ina', 'ina', stats.ina) + card('Joshua', 'joshua', stats.joshua);
   }
 
   // -------------------------------------------------------------------------
@@ -383,6 +437,9 @@
         const schoolName = getSchoolHolidayName(date, schoolRanges);
         if (schoolName) {
           classes.push('cell--school');
+          if (isoDay <= 5 && isSFOOpen(date, year)) {
+            classes.push('cell--sfo-open');
+          }
         }
 
         if (sameDay(date, today)) {
@@ -460,11 +517,25 @@
     renderYear(year);
   }
 
+  function initLegendToggle() {
+    const items = document.querySelectorAll('.legend__item[data-toggle]');
+    const grid = document.getElementById('year-grid');
+    items.forEach(item => {
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', () => {
+        const key = item.dataset.toggle;
+        item.classList.toggle('legend__item--inactive');
+        grid.classList.toggle(`hide-${key}`);
+      });
+    });
+  }
+
   function init() {
     const nav = document.querySelector('.year-nav');
     if (nav) nav.addEventListener('click', handleYearNavClick);
     setActiveButton(state.year);
     renderYear(state.year);
+    initLegendToggle();
   }
 
   if (document.readyState === 'loading') {
