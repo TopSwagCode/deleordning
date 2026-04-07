@@ -231,6 +231,58 @@
   }
 
   // -------------------------------------------------------------------------
+  // Stats — vacation days needed per parent
+  // -------------------------------------------------------------------------
+
+  function computeStats(year) {
+    const holidays = getPublicHolidays(year);
+    const schoolRanges = getSchoolHolidays(year);
+    const ina = { vacation: 0, schoolDays: 0 };
+    const joshua = { vacation: 0, schoolDays: 0 };
+
+    const daysInYear = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 366 : 365;
+    for (let d = 0; d < daysInYear; d++) {
+      const date = new Date(year, 0, 1 + d);
+      const isoDay = getISODay(date);
+      if (isoDay >= 6) continue; // weekends — not work days
+
+      const parent = getParent(date);
+      const isHoliday = holidays.has(dateKey(date));
+      const isSchoolClosed = !!getSchoolHolidayName(date, schoolRanges);
+
+      if (isHoliday) continue; // public holiday — already off work
+
+      if (isSchoolClosed) {
+        if (parent === 'ina') ina.vacation++;
+        else joshua.vacation++;
+      } else {
+        if (parent === 'ina') ina.schoolDays++;
+        else joshua.schoolDays++;
+      }
+    }
+    return { ina, joshua };
+  }
+
+  function renderStats(year) {
+    const container = document.getElementById('stats-section');
+    if (!container) return;
+
+    const stats = computeStats(year);
+    container.innerHTML = `
+      <div class="stats__card stats__card--ina">
+        <h3 class="stats__name">Ina</h3>
+        <div class="stats__number">${stats.ina.vacation}</div>
+        <div class="stats__label">feriedage skal bruges</div>
+      </div>
+      <div class="stats__card stats__card--joshua">
+        <h3 class="stats__name">Joshua</h3>
+        <div class="stats__number">${stats.joshua.vacation}</div>
+        <div class="stats__label">feriedage skal bruges</div>
+      </div>
+    `;
+  }
+
+  // -------------------------------------------------------------------------
   // Rendering
   // -------------------------------------------------------------------------
 
@@ -316,7 +368,12 @@
         cell.setAttribute('role', 'gridcell');
 
         const parent = getParent(date);
+        const isoDay = getISODay(date);
         const classes = ['cell', `cell--${parent}`];
+
+        if (isoDay >= 6) {
+          classes.push('cell--weekend');
+        }
 
         const holidayInfo = holidays.get(dateKey(date));
         if (holidayInfo) {
@@ -370,6 +427,7 @@
       frag.appendChild(renderMonth(year, m, holidays, schoolRanges, today));
     }
     container.appendChild(frag);
+    renderStats(year);
   }
 
   // -------------------------------------------------------------------------

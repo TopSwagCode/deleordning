@@ -12,6 +12,7 @@
   --color-holiday: #c1121f;
   --color-observance: #b5651d;
   --color-school: #6a4c93;
+  --color-weekend: #16a34a;
 
   /* Neutrals */
   --color-bg: #f7f7f5;
@@ -147,10 +148,12 @@ body {
 .legend__swatch--joshua { background: var(--color-joshua-bg); border-color: var(--color-joshua); }
 .legend__swatch--today {
   background: var(--color-surface);
-  border: 2px solid var(--color-today-ring);
+  outline: 2px solid var(--color-today-ring);
+  outline-offset: -2px;
 }
 .legend__swatch--holiday {
   background: var(--color-surface);
+  border: 2px solid var(--color-holiday);
   color: var(--color-holiday);
   position: relative;
 }
@@ -167,6 +170,7 @@ body {
 }
 .legend__swatch--observance {
   background: var(--color-surface);
+  border: 2px solid var(--color-holiday);
   position: relative;
 }
 .legend__swatch--observance::after {
@@ -191,6 +195,10 @@ body {
     ),
     var(--color-surface);
   border-color: var(--color-school);
+}
+.legend__swatch--weekend {
+  background: var(--color-surface);
+  border: 2px solid var(--color-weekend);
 }
 
 /* ---------- Year grid ---------- */
@@ -276,6 +284,8 @@ body {
   color: var(--color-text-muted);
   font-size: 0.7rem;
   font-weight: 600;
+  aspect-ratio: auto;
+  min-height: 0;
 }
 
 .cell--empty {
@@ -295,11 +305,25 @@ body {
 .cell--holiday {
   color: var(--color-holiday);
   font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--color-holiday);
 }
 
 .cell--observance {
   color: var(--color-observance);
   font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--color-holiday);
+}
+
+.cell--weekend {
+  box-shadow: inset 0 0 0 2px var(--color-weekend);
+}
+
+/* Weekend + holiday/observance: holiday border wins */
+.cell--weekend.cell--holiday {
+  box-shadow: inset 0 0 0 2px var(--color-holiday);
+}
+.cell--weekend.cell--observance {
+  box-shadow: inset 0 0 0 2px var(--color-holiday);
 }
 
 /* School holiday: diagonal stripe overlay */
@@ -318,9 +342,10 @@ body {
   pointer-events: none;
 }
 
-/* Today ring (drawn above backgrounds) */
+/* Today ring (drawn above backgrounds, uses outline so it stacks with holiday box-shadow) */
 .cell--today {
-  box-shadow: inset 0 0 0 2px var(--color-today-ring);
+  outline: 2px solid var(--color-today-ring);
+  outline-offset: -2px;
   font-weight: 700;
 }
 
@@ -412,7 +437,8 @@ body {
   }
 
   .cell--today {
-    box-shadow: inset 0 0 0 2px #000;
+    outline: 2px solid #000;
+    outline-offset: -2px;
   }
 
   .cell--holiday,
