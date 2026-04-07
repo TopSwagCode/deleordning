@@ -61,7 +61,7 @@
         [2, 7, 2, 15],      // Vinterferie
         [3, 28, 4, 6],      // Påskeferie (undtagen helligdage)
         [5, 14, 5, 14],     // Kristi Himmelfart (torsdag, fri ofte lukket)
-        [6, 27, 7, 17],     // Sommerferie del 1
+        [6, 27, 7, 12],     // Sommerferie del 1 (SFO lukket uge 29-31)
         [8, 1, 8, 9],       // Sommerferie del 2
         [10, 10, 10, 18],   // Efterårsferie
         [12, 19, 12, 31],   // Juleferie (undtagen helligdage)
